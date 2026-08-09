@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Home - REC Management System</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="top-bar">
+        <div class="logo">
+            REC Management System
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
+    </header>
+
+
+    <main class="employee-container">
+
+        <div class="welcome-section">
+            <h1>Employee Home</h1>
+            <p>Welcome to the REC Management System</p>
+        </div>
+
+
+        <div class="employee-actions">
+
+            <div class="action-box">
+                <h2>New Receipt</h2>
+
+                <p>
+                    Create and save a new payment receipt.
+                </p>
+
+                <button onclick="openNewReceipt()">
+                    New Receipt
+                </button>
+            </div>
+
+
+            <div class="action-box">
+                <h2>View Receipts</h2>
+
+                <p>
+                    View previously created payment receipts.
+                </p>
+
+                <button onclick="openReceipts()">
+                    View Receipts
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>

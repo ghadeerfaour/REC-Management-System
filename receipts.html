@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>View Receipts - REC Management System</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="top-bar">
+
+        <div class="logo">
+            REC Management System
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
+
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="receipts-container">
+
+        <div class="page-header">
+
+            <h1>Payment Receipts</h1>
+
+            <p>
+                View all recorded payment receipts.
+            </p>
+
+        </div>
+
+
+        <!-- Search -->
+        <div class="receipt-search">
+
+            <input
+                type="text"
+                id="receiptSearch"
+                placeholder="Search by customer name..."
+            >
+
+        </div>
+
+
+        <!-- Receipts Table -->
+        <div class="table-container">
+
+            <table id="receiptsTable">
+
+                <thead>
+
+                    <tr>
+                        <th>Receipt #</th>
+                        <th>Customer</th>
+                        <th>Payment</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Created By</th>
+                        <th>Created At</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="receiptsTableBody">
+
+                    <!-- Receipts will appear here -->
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="back-btn"
+            onclick="goBack()">
+            Back to Employee Home
+        </button>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

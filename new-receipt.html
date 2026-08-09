@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Receipt - REC Management System</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="top-bar">
+
+        <div class="logo">
+            REC Management System
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+            Logout
+        </button>
+
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="receipt-container">
+
+        <div class="page-header">
+            <h1>New Payment Receipt</h1>
+            <p>Enter the payment information below.</p>
+        </div>
+
+
+        <!-- Receipt Form -->
+        <form id="receiptForm" class="receipt-form">
+
+            <!-- Customer -->
+            <div class="input-group">
+
+                <label for="customerName">
+                    Customer Name
+                </label>
+
+                <input
+                    type="text"
+                    id="customerName"
+                    name="customerName"
+                    placeholder="Enter customer name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Payment Description -->
+            <div class="input-group">
+
+                <label for="paymentDescription">
+                    Payment Description
+                </label>
+
+                <input
+                    type="text"
+                    id="paymentDescription"
+                    name="paymentDescription"
+                    placeholder="Enter payment description"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Amount -->
+            <div class="input-group">
+
+                <label for="amount">
+                    Amount
+                </label>
+
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    placeholder="Enter amount"
+                    min="0"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Payment Date -->
+            <div class="input-group">
+
+                <label for="paymentDate">
+                    Payment Date
+                </label>
+
+                <input
+                    type="date"
+                    id="paymentDate"
+                    name="paymentDate"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="receipt-buttons">
+
+                <button
+                    type="submit"
+                    class="save-btn">
+                    Save Receipt
+                </button>
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="goBack()">
+                    Cancel
+                </button>
+
+            </div>
+
+
+            <!-- Success / Error Message -->
+            <div
+                id="receiptMessage"
+                class="receipt-message">
+            </div>
+
+        </form>
+
+    </main>
+
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
