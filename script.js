@@ -730,8 +730,18 @@ if (receiptsTableBody) {
                             receipt.created_at
                         )}
                     </td>
+                    <td>
+     <td>
+        <button
+            type="button"
+            class="pdf-btn"
+            onclick="printReceipt(${receipt.receipt_id})">
 
-                `;
+            🖨 PDF
+
+        </button>
+    </td>
+      `;
 
 
                 receiptsTableBody.appendChild(
@@ -850,6 +860,484 @@ function goBack() {
 
     window.location.href =
         "employee-home.html";
+
+}
+function printReceipt(receiptId) {
+
+    const receiptWindow =
+        window.open(
+            "",
+            "_blank",
+            "width=800,height=900"
+        );
+
+
+    if (!receiptWindow) {
+
+        alert(
+            "Please allow pop-ups for this website."
+        );
+
+        return;
+    }
+
+
+    receiptWindow.document.write(`
+
+        <!DOCTYPE html>
+
+        <html>
+
+        <head>
+
+            <title>Payment Receipt #${receiptId}</title>
+
+            <style>
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                body {
+                    margin: 0;
+                    padding: 40px;
+
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
+
+                    color: #26364a;
+
+                    background: white;
+                }
+
+                .receipt {
+                    max-width: 750px;
+                    margin: auto;
+                    padding: 40px;
+
+                    border: 1px solid #ddd;
+                }
+
+                .header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+
+                    padding-bottom: 20px;
+
+                    border-bottom:
+                        2px solid #26364a;
+                }
+
+                h1 {
+                    margin: 0;
+
+                    font-size: 28px;
+                }
+
+                .subtitle {
+                    margin-top: 8px;
+
+                    color: #687580;
+                }
+
+                .receipt-number {
+                    text-align: right;
+                }
+
+                .receipt-number strong {
+                    display: block;
+
+                    margin-top: 5px;
+
+                    font-size: 22px;
+
+                    color: #2b60a0;
+                }
+
+                .section {
+                    margin-top: 30px;
+                }
+
+                .section-title {
+                    margin-bottom: 12px;
+
+                    font-size: 15px;
+
+                    font-weight: bold;
+
+                    color: #26364a;
+                }
+
+                .info-box {
+                    padding: 18px;
+
+                    background: #f5f7f9;
+
+                    border-radius: 8px;
+                }
+
+                .row {
+                    display: flex;
+
+                    justify-content:
+                        space-between;
+
+                    gap: 20px;
+
+                    padding: 15px 0;
+
+                    border-bottom:
+                        1px solid #e5e8eb;
+                }
+
+                .row:last-child {
+                    border-bottom: none;
+                }
+
+                .label {
+                    color: #687580;
+                }
+
+                .value {
+                    font-weight: bold;
+
+                    text-align: right;
+                }
+
+                .amount {
+                    margin-top: 25px;
+
+                    padding: 20px;
+
+                    background: #f5f7f9;
+
+                    text-align: center;
+
+                    border-radius: 8px;
+                }
+
+                .amount-label {
+                    color: #687580;
+
+                    font-size: 14px;
+                }
+
+                .amount-value {
+                    margin-top: 8px;
+
+                    font-size: 30px;
+
+                    font-weight: bold;
+
+                    color: #2b60a0;
+                }
+
+                .footer {
+                    margin-top: 40px;
+
+                    padding-top: 20px;
+
+                    border-top:
+                        1px solid #ddd;
+
+                    text-align: center;
+
+                    color: #687580;
+                }
+
+                .success {
+                    color: #2c825d;
+
+                    font-weight: bold;
+                }
+
+                @media print {
+
+                    body {
+                        padding: 0;
+                    }
+
+                    .receipt {
+                        border: none;
+                        padding: 20px;
+                    }
+
+                }
+
+            </style>
+
+        </head>
+
+
+        <body>
+
+            <div class="receipt">
+
+                <div class="header">
+
+                    <div>
+
+                        <h1>
+                            PAYMENT RECEIPT
+                        </h1>
+
+                        <div class="subtitle">
+                            Payment Receipt Management System
+                        </div>
+
+                    </div>
+
+
+                    <div class="receipt-number">
+
+                        Receipt No.
+
+                        <strong>
+                            ${receiptId}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="section">
+
+                    <div class="section-title">
+                        Customer Information
+                    </div>
+
+                    <div class="info-box">
+
+                        <div class="row">
+
+                            <span class="label">
+                                Customer Name
+                            </span>
+
+                            <span
+                                class="value"
+                                id="printCustomer">
+                                Loading...
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="section">
+
+                    <div class="section-title">
+                        Payment Information
+                    </div>
+
+                    <div class="info-box">
+
+                        <div class="row">
+
+                            <span class="label">
+                                Description
+                            </span>
+
+                            <span
+                                class="value"
+                                id="printDescription">
+                                Loading...
+                            </span>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span class="label">
+                                Payment Date
+                            </span>
+
+                            <span
+                                class="value"
+                                id="printDate">
+                                Loading...
+                            </span>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span class="label">
+                                Created By
+                            </span>
+
+                            <span
+                                class="value"
+                                id="printEmployee">
+                                Loading...
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="amount">
+
+                    <div class="amount-label">
+                        AMOUNT PAID
+                    </div>
+
+                    <div
+                        class="amount-value"
+                        id="printAmount">
+
+                        Loading...
+
+                    </div>
+
+                </div>
+
+
+                <div class="footer">
+
+                    <div class="success">
+                        ✓ Payment received successfully
+                    </div>
+
+                    <p>
+                        Thank you for your payment.
+                    </p>
+
+                    <small>
+                        This receipt was generated electronically.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <script>
+
+                const SUPABASE_URL =
+                    "${SUPABASE_URL}";
+
+                const SUPABASE_KEY =
+                    "${SUPABASE_KEY}";
+
+
+                fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/payment_receipts" +
+                    "?receipt_id=eq.${receiptId}" +
+                    "&select=*",
+                    {
+                        headers: {
+                            "apikey":
+                                SUPABASE_KEY
+                        }
+                    }
+                )
+
+                .then(
+                    response =>
+                        response.json()
+                )
+
+                .then(
+                    data => {
+
+                        if (
+                            !data ||
+                            data.length === 0
+                        ) {
+
+                            document.body.innerHTML =
+                                "<h2>Receipt not found.</h2>";
+
+                            return;
+                        }
+
+
+                        const receipt =
+                            data[0];
+
+
+                        document.getElementById(
+                            "printCustomer"
+                        ).textContent =
+                            receipt.customer_name || "";
+
+
+                        document.getElementById(
+                            "printDescription"
+                        ).textContent =
+                            receipt.payment_description || "";
+
+
+                        document.getElementById(
+                            "printDate"
+                        ).textContent =
+                            receipt.payment_date || "";
+
+
+                        document.getElementById(
+                            "printEmployee"
+                        ).textContent =
+                            receipt.created_by || "";
+
+
+                        document.getElementById(
+                            "printAmount"
+                        ).textContent =
+                            "$" +
+                            Number(
+                                receipt.amount || 0
+                            ).toFixed(2);
+
+
+                        setTimeout(
+                            function() {
+
+                                window.print();
+
+                            },
+                            500
+                        );
+
+                    }
+                )
+
+                .catch(
+                    error => {
+
+                        console.error(
+                            error
+                        );
+
+                        document.body.innerHTML =
+                            "<h2>Could not load receipt.</h2>";
+
+                    }
+                );
+
+            <\/script>
+
+        </body>
+
+        </html>
+
+    `);
+
+
+    receiptWindow.document.close();
 
 }
 
