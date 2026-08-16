@@ -2,50 +2,96 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>New Receipt - REC Management System</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+    <title>
+        New Receipt - REC Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
 </head>
+
 
 <body>
 
-    <!-- Header -->
+    <!-- ==================================================
+         HEADER
+         ================================================== -->
+
     <header class="top-bar">
 
         <div class="logo">
             REC Management System
         </div>
 
-        <button class="logout-btn" onclick="logout()">
+        <button
+            class="logout-btn"
+            onclick="logout()">
+
             Logout
+
         </button>
 
     </header>
 
 
-    <!-- Main Content -->
-     <div class="greenlab-header">
-    <img
-        src="greenlab-logo.png"
-        alt="GreenLab Logo"
-        class="greenlab-logo"
-    >
-</div>
+    <!-- ==================================================
+         GREENLAB LOGO
+         ================================================== -->
+
+    <div class="greenlab-header">
+
+        <img
+            src="greenlab-logo.png"
+            alt="GreenLab Logo"
+            class="greenlab-logo">
+
+    </div>
+
+
+    <!-- ==================================================
+         MAIN CONTENT
+         ================================================== -->
 
     <main class="receipt-container">
 
+
+        <!-- Page Header -->
+
         <div class="page-header">
-            <h1>New Payment Receipt</h1>
-            <p>Enter the payment information below.</p>
+
+            <h1>
+                New Payment Receipt
+            </h1>
+
+            <p>
+                Enter the payment information below.
+            </p>
+
         </div>
 
-        <!-- Receipt Form -->
-        <form id="receiptForm" class="receipt-form">
 
-            <!-- Customer -->
+        <!-- ==================================================
+             RECEIPT FORM
+             ================================================== -->
+
+        <form
+            id="receiptForm"
+            class="receipt-form">
+
+
+            <!-- ==================================================
+                 CUSTOMER NAME
+                 ================================================== -->
+
             <div class="input-group">
 
                 <label for="customerName">
@@ -57,13 +103,15 @@
                     id="customerName"
                     name="customerName"
                     placeholder="Enter customer name"
-                    required
-                >
+                    required>
 
             </div>
 
 
-            <!-- Payment Description -->
+            <!-- ==================================================
+                 PAYMENT DESCRIPTION
+                 ================================================== -->
+
             <div class="input-group">
 
                 <label for="paymentDescription">
@@ -75,13 +123,15 @@
                     id="paymentDescription"
                     name="paymentDescription"
                     placeholder="Enter payment description"
-                    required
-                >
+                    required>
 
             </div>
 
 
-            <!-- Amount -->
+            <!-- ==================================================
+                 AMOUNT
+                 ================================================== -->
+
             <div class="input-group">
 
                 <label for="amount">
@@ -95,13 +145,15 @@
                     placeholder="Enter amount"
                     min="0"
                     step="0.01"
-                    required
-                >
+                    required>
 
             </div>
 
 
-            <!-- Payment Date -->
+            <!-- ==================================================
+                 PAYMENT DATE
+                 ================================================== -->
+
             <div class="input-group">
 
                 <label for="paymentDate">
@@ -112,112 +164,146 @@
                     type="date"
                     id="paymentDate"
                     name="paymentDate"
-                    required
-                >
+                    required>
 
             </div>
+
+
+            <!-- ==================================================
+                 RECEIPT TYPE
+                 ================================================== -->
+
             <div class="form-group">
 
-    <label for="receiptType">
-        Receipt Type
-    </label>
+                <label for="receiptType">
+                    Receipt Type
+                </label>
 
-    <div class="receipt-type-options">
+                <div class="receipt-type-options">
 
-        <label class="receipt-type-option">
+                    <label class="receipt-type-option">
 
-            <input
-                type="radio"
-                name="receiptType"
-                value="actual"
-                checked
-            >
+                        <input
+                            type="radio"
+                            name="receiptType"
+                            value="actual"
+                            checked>
 
-            <span>
-                Actual Receipt
-            </span>
+                        <span>
+                            Actual Receipt
+                        </span>
 
-        </label>
-
-
-        <label class="receipt-type-option">
-
-            <input
-                type="radio"
-                name="receiptType"
-                value="official"
-            >
-
-            <span>
-                Official Receipt
-            </span>
-
-        </label>
-
-    </div>
-    <div class="form-group">
-
-    <label>Receipt Company</label>
-
-    <div class="receipt-company-options">
-
-        <label>
-            <input
-                type="radio"
-                name="company"
-                value="GreenLab"
-                checked
-            >
-            GreenLab
-        </label>
-
-        <label>
-            <input
-                type="radio"
-                name="company"
-                value="Biocare"
-            >
-            Biocare
-        </label>
-
-    </div>
-
-</div>
-
-</div>
+                    </label>
 
 
-            <!-- Buttons -->
+                    <label class="receipt-type-option">
+
+                        <input
+                            type="radio"
+                            name="receiptType"
+                            value="official">
+
+                        <span>
+                            Official Receipt
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 RECEIPT COMPANY
+                 ================================================== -->
+
+            <div class="form-group">
+
+                <label>
+                    Receipt Company
+                </label>
+
+                <div class="receipt-company-options">
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="company"
+                            value="GreenLab"
+                            checked>
+
+                        GreenLab
+
+                    </label>
+
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="company"
+                            value="Biocare">
+
+                        Biocare
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 BUTTONS
+                 ================================================== -->
+
             <div class="receipt-buttons">
 
                 <button
                     type="submit"
                     class="save-btn">
+
                     Save Receipt
+
                 </button>
 
-               <button
-    type="button"
-    class="cancel-btn"
-    onclick="goToCorrectHome()">
-    Cancel
-</button>
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="goToCorrectHome()">
+
+                    Cancel
+
+                </button>
+
             </div>
 
 
-            <!-- Success / Error Message -->
+            <!-- ==================================================
+                 SUCCESS / ERROR MESSAGE
+                 ================================================== -->
+
             <div
                 id="receiptMessage"
                 class="receipt-message">
             </div>
+
 
         </form>
 
     </main>
 
 
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+    <!-- ==================================================
+         JAVASCRIPT
+         ================================================== -->
+
+    <script
+        src="script.js">
+    </script>
 
 </body>
 

@@ -1818,163 +1818,246 @@ body {
 
 }
 /* ======================================================
-   EMPLOYEE - NEW RECEIPT RESPONSIVE
+   NEW RECEIPT - MOBILE RESPONSIVE
    ====================================================== */
 
 @media (max-width: 768px) {
 
-    /* Main receipt page */
+    /* Main page */
 
-    .receipt-container,
-    .new-receipt-container {
+    .receipt-container {
         width: calc(100% - 24px);
         max-width: 100%;
         margin: 20px auto;
+        padding: 0;
     }
 
 
-    /* Receipt form/card */
+    /* GreenLab logo */
 
-    .receipt-form,
-    .new-receipt-form {
+    .greenlab-header {
         width: 100%;
-        padding: 18px;
+        padding: 15px 10px;
+        text-align: center;
+    }
+
+    .greenlab-logo {
+        max-width: 180px;
+        width: 60%;
+        height: auto;
+    }
+
+
+    /* Page heading */
+
+    .receipt-container .page-header {
+        margin-bottom: 20px;
+    }
+
+    .receipt-container .page-header h1 {
+        font-size: 24px;
+        line-height: 1.3;
+    }
+
+    .receipt-container .page-header p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+
+    /* Receipt form */
+
+    .receipt-form {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px;
         box-sizing: border-box;
     }
 
 
-    /* Form rows */
+    /* Input groups */
 
-    .receipt-form .form-row,
-    .new-receipt-form .form-row,
-    .form-row {
-        display: flex;
-        flex-direction: column;
+    .receipt-form .input-group,
+    .receipt-form .form-group {
         width: 100%;
-        gap: 12px;
-    }
-
-
-    /* Form groups */
-
-    .receipt-form .form-group,
-    .new-receipt-form .form-group,
-    .form-group {
-        width: 100%;
+        margin-bottom: 18px;
+        box-sizing: border-box;
     }
 
 
     /* Labels */
 
-    .receipt-form label,
-    .new-receipt-form label,
-    .form-group label {
+    .receipt-form .input-group label,
+    .receipt-form .form-group > label {
+        display: block;
+        width: 100%;
+        margin-bottom: 7px;
         font-size: 14px;
     }
 
 
     /* Inputs */
 
-    .receipt-form input,
-    .receipt-form select,
-    .receipt-form textarea,
-
-    .new-receipt-form input,
-    .new-receipt-form select,
-    .new-receipt-form textarea,
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .receipt-form input[type="text"],
+    .receipt-form input[type="number"],
+    .receipt-form input[type="date"] {
         width: 100%;
         max-width: 100%;
-        min-height: 43px;
+        min-height: 44px;
+        padding: 11px 12px;
         box-sizing: border-box;
         font-size: 14px;
     }
 
 
-    /* Textarea */
+    /* ==================================================
+       RECEIPT TYPE
+       ================================================== */
 
-    .receipt-form textarea,
-    .new-receipt-form textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-
-    /* Buttons */
-
-    .receipt-form button,
-    .new-receipt-form button {
-        width: 100%;
-        min-height: 44px;
-        font-size: 14px;
-    }
-
-
-    /* Button container */
-
-    .receipt-form .form-buttons,
-    .new-receipt-form .form-buttons {
+    .receipt-type-options {
         display: flex;
         flex-direction: column;
         gap: 10px;
         width: 100%;
     }
 
+    .receipt-type-option {
+        width: 100%;
+        min-height: 44px;
+        padding: 11px 13px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
 
-    /* Receipt title */
-
-    .receipt-container h1,
-    .new-receipt-container h1 {
-        font-size: 24px;
-        line-height: 1.3;
+    .receipt-type-option input[type="radio"] {
+        width: auto;
+        min-height: auto;
+        flex-shrink: 0;
     }
 
 
-    .receipt-container p,
-    .new-receipt-container p {
-        font-size: 13px;
-        line-height: 1.5;
+    /* ==================================================
+       RECEIPT COMPANY
+       ================================================== */
+
+    .receipt-company-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .receipt-company-options label {
+        width: 100%;
+        min-height: 44px;
+        padding: 11px 13px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .receipt-company-options input[type="radio"] {
+        width: auto;
+        min-height: auto;
+        flex-shrink: 0;
+    }
+
+
+    /* ==================================================
+       BUTTONS
+       ================================================== */
+
+    .receipt-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .receipt-buttons button {
+        width: 100%;
+        min-height: 46px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+
+    /* Success / error message */
+
+    .receipt-message {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 15px;
+        word-wrap: break-word;
     }
 
 }
 
 
 /* ======================================================
-   EMPLOYEE NEW RECEIPT - VERY SMALL PHONES
+   VERY SMALL PHONES
    ====================================================== */
 
 @media (max-width: 480px) {
 
-    .receipt-container,
-    .new-receipt-container {
+    .receipt-container {
         width: calc(100% - 16px);
         margin: 15px auto;
     }
 
 
-    .receipt-form,
-    .new-receipt-form {
-        padding: 14px;
+    .greenlab-header {
+        padding: 10px;
+    }
+
+    .greenlab-logo {
+        max-width: 150px;
+        width: 55%;
     }
 
 
-    .receipt-container h1,
-    .new-receipt-container h1 {
+    .receipt-container .page-header h1 {
         font-size: 21px;
     }
 
 
-    .receipt-form input,
-    .receipt-form select,
-    .receipt-form textarea,
+    .receipt-container .page-header p {
+        font-size: 12px;
+    }
 
-    .new-receipt-form input,
-    .new-receipt-form select,
-    .new-receipt-form textarea {
+
+    .receipt-form {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+
+    .receipt-form .input-group,
+    .receipt-form .form-group {
+        margin-bottom: 15px;
+    }
+
+
+    .receipt-form input[type="text"],
+    .receipt-form input[type="number"],
+    .receipt-form input[type="date"] {
+        min-height: 43px;
         font-size: 14px;
+    }
+
+
+    .receipt-type-option,
+    .receipt-company-options label {
+        font-size: 13px;
+    }
+
+
+    .receipt-buttons button {
+        min-height: 44px;
     }
 
 }
