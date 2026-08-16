@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        User Collections - REC Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="top-bar">
+
+        <div class="logo">
+            REC Management System
+        </div>
+
+        <div class="owner-title">
+            User Collections
+        </div>
+
+        <button
+            class="logout-btn"
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main class="owner-container">
+
+        <div class="page-header">
+
+            <h1>
+                Total Collected by User
+            </h1>
+
+            <p>
+                View the total amount collected by each user.
+            </p>
+
+        </div>
+
+
+        <!-- COLLECTION TABLE -->
+
+        <section class="owner-user-collections">
+
+            <div class="owner-user-collections-table">
+
+                <table id="userCollectionsTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                User ID
+                            </th>
+
+                            <th>
+                                User
+                            </th>
+
+                            <th>
+                                Total Collected
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="userCollectionsTableBody">
+
+                    </tbody>
+
+
+                    <tfoot>
+
+                        <tr>
+
+                            <th colspan="2">
+                                Total
+                            </th>
+
+                            <th id="usersGrandTotal">
+                                $0.00
+                            </th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- BACK -->
+
+        <button
+            type="button"
+            class="back-btn"
+            onclick="goBackToOwner()">
+
+            Back to Owner Dashboard
+
+        </button>
+
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

@@ -212,12 +212,28 @@ if (loginForm) {
 
             // Go to employee home
 
-            setTimeout(function () {
+           setTimeout(function () {
 
-                window.location.href =
-                    "employee-home.html";
+    const userRole =
+        String(user.role)
+            .trim()
+            .toLowerCase();
 
-            }, 500);
+    console.log("User role:", userRole);
+
+    if (userRole === "owner") {
+
+        window.location.href =
+            "owner-home.html";
+
+    } else {
+
+        window.location.href =
+            "employee-home.html";
+
+    }
+
+}, 500);
 
         }
 
@@ -239,6 +255,51 @@ if (loginForm) {
         }
 
     });
+
+}
+// ======================================================
+// GO TO CORRECT HOME PAGE
+// ======================================================
+
+function goToCorrectHome() {
+
+    const savedUser =
+        localStorage.getItem("loggedInUser");
+
+
+    if (!savedUser) {
+
+        window.location.href =
+            "index.html";
+
+        return;
+
+    }
+
+
+    const loggedInUser =
+        JSON.parse(savedUser);
+
+
+    const userRole =
+        String(
+            loggedInUser.role || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (userRole === "owner") {
+
+        window.location.href =
+            "owner-home.html";
+
+    } else {
+
+        window.location.href =
+            "employee-home.html";
+
+    }
 
 }
 
@@ -327,6 +388,34 @@ function openReceipts() {
         "receipts.html";
 
 }
+function openBiocareReceipts() {
+
+    window.location.href =
+        "bioclare-receipts.html";
+
+}
+// ======================================================
+// OPEN OWNER GREENLAB RECEIPTS
+// ======================================================
+
+function openOwnerGreenlabReceipts() {
+
+    window.location.href =
+        "receipts.html";
+
+}
+
+
+// ======================================================
+// OPEN OWNER BIOCLARE RECEIPTS
+// ======================================================
+
+function openOwnerBiocareReceipts() {
+
+    window.location.href =
+        "bioclare-receipts.html";
+
+}
 
 
 // ======================================================
@@ -370,6 +459,14 @@ if (receiptForm) {
                 document.getElementById(
                     "paymentDate"
                 ).value;
+                const receiptType =
+    document.querySelector(
+        'input[name="receiptType"]:checked'
+    )?.value || "actual";
+    const company =
+    document.querySelector(
+        'input[name="company"]:checked'
+    )?.value || "GreenLab";
 
 
             const receiptMessage =
@@ -470,6 +567,12 @@ if (receiptForm) {
 
                                     payment_date:
                                         paymentDate,
+                                          receipt_type:
+        receiptType,
+
+company:
+    company,
+
 
                                     created_by:
                                         loggedInUser.user_id
@@ -568,12 +671,12 @@ if (receiptsTableBody) {
 
         try {
 
-            const url =
-                SUPABASE_URL +
-                "/rest/v1/payment_receipts" +
-                "?select=receipt_id,customer_name,payment_description,amount,payment_date,created_by,created_at" +
-                "&order=receipt_id.desc";
-
+          const url =
+    SUPABASE_URL +
+    "/rest/v1/payment_receipts" +
+    "?select=receipt_id,greenlab_receipt_id,official_receipt_id,customer_name,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
+    "&company=eq.GreenLab" +
+    "&order=receipt_id.desc";
 
             console.log(
                 "Loading receipts..."
@@ -696,9 +799,12 @@ if (receiptsTableBody) {
                 row.innerHTML = `
 
                     <td>
-                        ${receipt.receipt_id}
-                    </td>
-
+    ${
+        receipt.receipt_type === "official"
+            ? receipt.official_receipt_id
+            : receipt.greenlab_receipt_id
+    }
+</td>
                     <td>
                         ${escapeHTML(
                             receipt.customer_name
@@ -731,6 +837,16 @@ if (receiptsTableBody) {
                         )}
                     </td>
                     <td>
+    <span class="receipt-type-badge">
+        ${
+            receipt.receipt_type === "official"
+                ? "Official"
+                : "Actual"
+        }
+    </span>
+</td>
+                    <td>
+                    
      <td>
         <button
             type="button"
@@ -777,11 +893,11 @@ if (receiptsTableBody) {
                 try {
 
                     let url =
-                        SUPABASE_URL +
-                        "/rest/v1/payment_receipts" +
-                        "?select=receipt_id,customer_name,payment_description,amount,payment_date,created_by,created_at" +
-                        "&order=receipt_id.desc";
-
+    SUPABASE_URL +
+    "/rest/v1/payment_receipts" +
+    "?select=receipt_id,greenlab_receipt_id,official_receipt_id,customer_name,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
+    "&company=eq.GreenLab" +
+    "&order=receipt_id.desc";
 
                     if (search !== "") {
 
@@ -1429,5 +1545,1595 @@ function escapeHTML(
             "'",
             "&#039;"
         );
+
+}
+// ======================================================
+// BIOCARE RECEIPTS
+// ======================================================
+
+const biocareReceiptsTableBody =
+    document.getElementById(
+        "biocareReceiptsTableBody"
+    );
+
+
+if (biocareReceiptsTableBody) {
+
+    loadBiocareReceipts();
+
+
+    async function loadBiocareReceipts() {
+
+        try {
+
+            const url =
+                SUPABASE_URL +
+                "/rest/v1/payment_receipts" +
+                "?select=receipt_id,biocare_receipt_id,biocare_official_receipt_id,customer_name,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
+                "&company=eq.Biocare" +
+                "&order=receipt_id.desc";
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+
+                        headers:
+                            getSupabaseHeaders()
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+                console.error(
+                    "LOAD BIOCARE RECEIPTS ERROR:",
+                    errorText
+                );
+
+                throw new Error(
+                    errorText
+                );
+            }
+
+
+            const receipts =
+                await response.json();
+
+
+            console.log(
+                "Biocare Receipts:",
+                receipts
+            );
+
+
+            displayBiocareReceipts(
+                receipts
+            );
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "BIOCARE RECEIPTS ERROR:",
+                error
+            );
+
+
+            biocareReceiptsTableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="9">
+
+                        ❌ Could not load Biocare receipts.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    // ==================================================
+    // DISPLAY BIOCARE RECEIPTS
+    // ==================================================
+
+    function displayBiocareReceipts(
+        receipts
+    ) {
+
+        biocareReceiptsTableBody.innerHTML =
+            "";
+
+
+        if (receipts.length === 0) {
+
+            biocareReceiptsTableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="9">
+
+                        No Biocare receipts found.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+        }
+
+
+        receipts.forEach(
+            function (receipt) {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                const displayReceiptNumber =
+                    receipt.receipt_type === "official"
+                        ? receipt.biocare_official_receipt_id
+                        : receipt.biocare_receipt_id;
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${displayReceiptNumber}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            receipt.customer_name
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHTML(
+                            receipt.payment_description
+                        )}
+                    </td>
+
+                    <td>
+                        ${Number(
+                            receipt.amount
+                        ).toFixed(2)}
+                    </td>
+
+                    <td>
+                        ${receipt.payment_date}
+                    </td>
+
+                    <td>
+                        ${receipt.created_by ?? ""}
+                    </td>
+
+                    <td>
+                        ${formatDate(
+                            receipt.created_at
+                        )}
+                    </td>
+
+                    <td>
+                        <span class="receipt-type-badge">
+                            ${
+                                receipt.receipt_type === "official"
+                                    ? "Official"
+                                    : "Actual"
+                            }
+                        </span>
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            onclick="printReceipt(${receipt.receipt_id})">
+
+                            🖨 PDF
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                biocareReceiptsTableBody.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    // ==================================================
+    // SEARCH BIOCARE RECEIPTS
+    // ==================================================
+
+    const biocareReceiptSearch =
+        document.getElementById(
+            "biocareReceiptSearch"
+        );
+
+
+    if (biocareReceiptSearch) {
+
+        biocareReceiptSearch.addEventListener(
+            "input",
+            async function () {
+
+                const search =
+                    biocareReceiptSearch.value.trim();
+
+
+                try {
+
+                    let url =
+                        SUPABASE_URL +
+                        "/rest/v1/payment_receipts" +
+                        "?select=receipt_id,biocare_receipt_id,biocare_official_receipt_id,customer_name,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
+                        "&company=eq.Biocare" +
+                        "&order=receipt_id.desc";
+
+
+                    if (search !== "") {
+
+                        url +=
+                            "&customer_name=ilike.*" +
+                            encodeURIComponent(
+                                search
+                            ) +
+                            "*";
+
+                    }
+
+
+                    const response =
+                        await fetch(
+                            url,
+                            {
+                                method: "GET",
+
+                                headers:
+                                    getSupabaseHeaders()
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        const errorText =
+                            await response.text();
+
+                        console.error(
+                            "BIOCARE SEARCH ERROR:",
+                            errorText
+                        );
+
+                        throw new Error(
+                            errorText
+                        );
+
+                    }
+
+
+                    const receipts =
+                        await response.json();
+
+
+                    displayBiocareReceipts(
+                        receipts
+                    );
+
+                }
+
+
+                catch (error) {
+
+                    console.error(
+                        "BIOCARE SEARCH ERROR:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+}
+// ======================================================
+// OWNER DASHBOARD
+// ======================================================
+
+if (
+    window.location.pathname
+        .toLowerCase()
+        .includes("owner-home")
+) {
+
+    const loggedInUser =
+        JSON.parse(
+            localStorage.getItem(
+                "loggedInUser"
+            )
+        );
+
+
+    // Make sure user is logged in
+
+    if (!loggedInUser) {
+
+        window.location.href =
+            "index.html";
+
+    }
+
+
+    // Make sure user is actually an owner
+
+    else if (
+        String(loggedInUser.role).toLowerCase() !==
+        "owner"
+    ) {
+
+        window.location.href =
+            "employee-home.html";
+
+    }
+
+
+    else {
+
+        // Show owner name
+
+        const ownerName =
+            document.getElementById(
+                "ownerName"
+            );
+
+
+        if (ownerName) {
+
+            ownerName.textContent =
+                loggedInUser.full_name;
+
+        }
+
+
+        // Load dashboard
+
+        loadOwnerDashboard();
+
+        loadOwnerReceipts();
+        
+
+    }
+
+}
+
+
+// ======================================================
+// OWNER DASHBOARD STATISTICS
+// ======================================================
+
+async function loadOwnerDashboard() {
+
+    try {
+
+        const url =
+            SUPABASE_URL +
+            "/rest/v1/payment_receipts" +
+            "?select=amount,company";
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers:
+                        getSupabaseHeaders()
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            console.error(
+                "OWNER DASHBOARD ERROR:",
+                errorText
+            );
+
+            throw new Error(
+                errorText
+            );
+
+        }
+
+
+        const receipts =
+            await response.json();
+
+
+        // Total receipts
+
+        const totalReceipts =
+            receipts.length;
+
+
+        // Total amount
+
+        const totalAmount =
+            receipts.reduce(
+                function (
+                    total,
+                    receipt
+                ) {
+
+                    return (
+                        total +
+                        Number(
+                            receipt.amount || 0
+                        )
+                    );
+
+                },
+                0
+            );
+
+
+        // GreenLab count
+
+        const greenlabTotal =
+            receipts.filter(
+                function (receipt) {
+
+                    return (
+                        receipt.company ===
+                        "GreenLab"
+                    );
+
+                }
+            ).length;
+
+
+        // Bioclare count
+
+        const biocareTotal =
+            receipts.filter(
+                function (receipt) {
+
+                    return (
+                        receipt.company ===
+                        "Biocare"
+                    );
+
+                }
+            ).length;
+
+
+        // Display values
+
+        document.getElementById(
+            "totalReceipts"
+        ).textContent =
+            totalReceipts;
+
+
+        document.getElementById(
+            "totalAmount"
+        ).textContent =
+            "$" +
+            totalAmount.toFixed(2);
+
+
+        document.getElementById(
+            "greenlabTotal"
+        ).textContent =
+            greenlabTotal;
+
+
+        document.getElementById(
+            "biocareTotal"
+        ).textContent =
+            biocareTotal;
+
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "OWNER DASHBOARD ERROR:",
+            error
+        );
+
+    }
+
+}
+// ======================================================
+// OWNER DASHBOARD
+// ======================================================
+
+if (
+    window.location.pathname
+        .toLowerCase()
+        .includes("owner-home")
+) {
+
+    // dashboard code...
+
+}
+
+
+
+// ======================================================
+// OWNER - ALL RECEIPTS
+// ======================================================
+
+async function loadOwnerReceipts() {
+
+    const tableBody =
+        document.getElementById(
+            "ownerReceiptsTableBody"
+        );
+
+    if (!tableBody) {
+        return;
+    }
+
+
+    try {
+
+        const url =
+            SUPABASE_URL +
+            "/rest/v1/payment_receipts" +
+            "?select=*" +
+            "&order=receipt_id.desc";
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers:
+                        getSupabaseHeaders()
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            console.error(
+                "OWNER RECEIPTS ERROR:",
+                errorText
+            );
+
+            throw new Error(
+                errorText
+            );
+
+        }
+
+
+        const receipts =
+            await response.json();
+
+
+        console.log(
+            "OWNER RECEIPTS:",
+            receipts
+        );
+
+
+        displayOwnerReceipts(
+            receipts
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "OWNER RECEIPTS ERROR:",
+            error
+        );
+
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="9">
+
+                    ❌ Could not load receipts.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+// ======================================================
+// DISPLAY OWNER RECEIPTS
+// ======================================================
+
+function displayOwnerReceipts(
+    receipts
+) {
+
+    const tableBody =
+        document.getElementById(
+            "ownerReceiptsTableBody"
+        );
+
+
+    if (!tableBody) {
+        return;
+    }
+
+
+    tableBody.innerHTML = "";
+
+
+    if (
+        !receipts ||
+        receipts.length === 0
+    ) {
+
+        tableBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="9">
+
+                    No receipts found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    receipts.forEach(
+        function (receipt) {
+            console.log(
+    "EDIT RECEIPT DATABASE ID:",
+    receipt.receipt_id,
+    receipt
+);
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            let displayReceiptNumber =
+                receipt.receipt_id;
+
+
+            // GreenLab
+
+            if (
+                receipt.company ===
+                "GreenLab"
+            ) {
+
+                if (
+                    receipt.receipt_type ===
+                    "official"
+                ) {
+
+                    displayReceiptNumber =
+                        receipt.official_receipt_id;
+
+                }
+
+                else if (
+                    receipt.greenlab_receipt_id
+                    !== undefined
+                ) {
+
+                    displayReceiptNumber =
+                        receipt.greenlab_receipt_id;
+
+                }
+
+            }
+
+
+            // Bioclare
+
+            if (
+                receipt.company ===
+                "Biocare"
+                ||
+                receipt.company ===
+                "Bioclare"
+            ) {
+
+                if (
+                    receipt.receipt_type ===
+                    "official"
+                ) {
+
+                    displayReceiptNumber =
+                        receipt.biocare_official_receipt_id;
+
+                }
+
+                else if (
+                    receipt.biocare_receipt_id
+                    !== undefined
+                ) {
+
+                    displayReceiptNumber =
+                        receipt.biocare_receipt_id;
+
+                }
+
+            }
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${displayReceiptNumber ?? ""}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        receipt.company || ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        receipt.customer_name || ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        receipt.payment_description || ""
+                    )}
+                </td>
+
+                <td>
+                    $${Number(
+                        receipt.amount || 0
+                    ).toFixed(2)}
+                </td>
+
+                <td>
+                    ${receipt.payment_date || ""}
+                </td>
+
+                <td>
+
+                    <span class="receipt-type-badge">
+
+                        ${
+                            receipt.receipt_type ===
+                            "official"
+                                ? "Official"
+                                : "Actual"
+                        }
+
+                    </span>
+
+                </td>
+
+                <td>
+                    ${receipt.created_by ?? ""}
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="edit-receipt-btn"
+                        onclick="editReceipt(${receipt.receipt_id})">
+
+                        Edit
+
+                    </button>
+
+                </td>
+
+            `;
+
+
+            tableBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// START OWNER RECEIPTS
+// ======================================================
+
+if (
+    window.location.pathname
+        .toLowerCase()
+        .includes("owner-home")
+) {
+
+    loadOwnerReceipts();
+    
+
+
+}
+// ======================================================
+// OWNER RECEIPTS SEARCH
+// ======================================================
+
+const ownerReceiptSearch =
+    document.getElementById(
+        "ownerReceiptSearch"
+    );
+
+
+if (ownerReceiptSearch) {
+
+    ownerReceiptSearch.addEventListener(
+        "input",
+        async function () {
+
+            const search =
+                ownerReceiptSearch.value.trim();
+
+
+            try {
+
+                let url =
+                    SUPABASE_URL +
+                    "/rest/v1/payment_receipts" +
+                    "?select=*" +
+                    "&order=receipt_id.desc";
+
+
+                // Search by customer name
+
+                if (search !== "") {
+
+                    url +=
+                        "&customer_name=ilike.*" +
+                        encodeURIComponent(
+                            search
+                        ) +
+                        "*";
+
+                }
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: "GET",
+
+                            headers:
+                                getSupabaseHeaders()
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    const errorText =
+                        await response.text();
+
+                    console.error(
+                        "OWNER SEARCH ERROR:",
+                        errorText
+                    );
+
+                    throw new Error(
+                        errorText
+                    );
+
+                }
+
+
+                const receipts =
+                    await response.json();
+
+
+                displayOwnerReceipts(
+                    receipts
+                );
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "OWNER SEARCH ERROR:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+}
+// ======================================================
+// OWNER - EDIT RECEIPT
+// ======================================================
+
+// ======================================================
+// OWNER - EDIT RECEIPT MODAL
+// ======================================================
+
+async function editReceipt(receiptId) {
+
+    try {
+
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/payment_receipts" +
+            "?receipt_id=eq." +
+            encodeURIComponent(receiptId) +
+            "&select=*",
+            {
+                method: "GET",
+                headers: getSupabaseHeaders()
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await response.text()
+            );
+        }
+
+        const receipts = await response.json();
+
+        if (!receipts.length) {
+            alert("Receipt not found.");
+            return;
+        }
+
+        const receipt = receipts[0];
+
+
+        // ==================================================
+        // CREATE MODAL
+        // ==================================================
+
+        const modal = document.createElement("div");
+
+        modal.className = "edit-receipt-modal";
+
+        modal.innerHTML = `
+
+            <div class="edit-receipt-box">
+
+                <div class="edit-receipt-header">
+
+                    <div>
+                        <h2>Edit Receipt</h2>
+                        <p>
+                            Receipt #${receipt.receipt_id}
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="edit-close-btn"
+                        id="closeEditModal">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="edit-receipt-body">
+
+                    <div class="edit-field">
+
+                        <label>
+                            Customer Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="editCustomerName"
+                            value="${escapeHTML(
+                                receipt.customer_name || ""
+                            )}"
+                        >
+
+                    </div>
+
+
+                    <div class="edit-field">
+
+                        <label>
+                            Payment Description
+                        </label>
+
+                        <input
+                            type="text"
+                            id="editPaymentDescription"
+                            value="${escapeHTML(
+                                receipt.payment_description || ""
+                            )}"
+                        >
+
+                    </div>
+
+
+                    <div class="edit-field">
+
+                        <label>
+                            Amount
+                        </label>
+
+                        <input
+                            type="number"
+                            step="0.01"
+                            id="editAmount"
+                            value="${receipt.amount ?? ""}"
+                        >
+
+                    </div>
+
+
+                    <div class="edit-field">
+
+                        <label>
+                            Payment Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="editPaymentDate"
+                            value="${receipt.payment_date || ""}"
+                        >
+
+                    </div>
+
+
+                    <div class="edit-readonly">
+
+                        <div>
+                            <span>Receipt ID</span>
+                            <strong>
+                                ${receipt.receipt_id}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Receipt Type</span>
+                            <strong>
+                                ${
+                                    receipt.receipt_type ===
+                                    "official"
+                                        ? "Official"
+                                        : "Actual"
+                                }
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="edit-receipt-footer">
+
+                    <button
+                        type="button"
+                        class="edit-cancel-btn"
+                        id="cancelEditReceipt">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        class="edit-save-btn"
+                        id="saveEditReceipt">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(modal);
+
+
+        // ==================================================
+        // CLOSE
+        // ==================================================
+
+        document
+            .getElementById("closeEditModal")
+            .onclick = () => modal.remove();
+
+
+        document
+            .getElementById("cancelEditReceipt")
+            .onclick = () => modal.remove();
+
+
+        // ==================================================
+        // SAVE
+        // ==================================================
+
+        document
+            .getElementById("saveEditReceipt")
+            .onclick = async function () {
+
+                const customerName =
+                    document
+                        .getElementById(
+                            "editCustomerName"
+                        )
+                        .value.trim();
+
+
+                const paymentDescription =
+                    document
+                        .getElementById(
+                            "editPaymentDescription"
+                        )
+                        .value.trim();
+
+
+                const amount =
+                    Number(
+                        document
+                            .getElementById(
+                                "editAmount"
+                            )
+                            .value
+                    );
+
+
+                const paymentDate =
+                    document
+                        .getElementById(
+                            "editPaymentDate"
+                        )
+                        .value;
+
+
+                if (!customerName) {
+
+                    alert(
+                        "Please enter the customer name."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    !Number.isFinite(amount) ||
+                    amount < 0
+                ) {
+
+                    alert(
+                        "Please enter a valid amount."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!paymentDate) {
+
+                    alert(
+                        "Please select the payment date."
+                    );
+
+                    return;
+
+                }
+
+
+                const updateResponse =
+                    await fetch(
+                        SUPABASE_URL +
+                        "/rest/v1/payment_receipts" +
+                        "?receipt_id=eq." +
+                        encodeURIComponent(
+                            receiptId
+                        ),
+                        {
+                            method: "PATCH",
+
+                            headers: {
+                                ...getSupabaseHeaders(),
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Prefer":
+                                    "return=representation"
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    customer_name:
+                                        customerName,
+
+                                    payment_description:
+                                        paymentDescription,
+
+                                    amount:
+                                        amount,
+
+                                    payment_date:
+                                        paymentDate
+
+                                })
+                        }
+                    );
+
+
+                if (!updateResponse.ok) {
+
+                    const error =
+                        await updateResponse.text();
+
+                    console.error(
+                        "EDIT ERROR:",
+                        error
+                    );
+
+                    alert(
+                        "Could not update receipt."
+                    );
+
+                    return;
+
+                }
+
+
+                modal.remove();
+
+
+                alert(
+                    "✓ Receipt updated successfully!"
+                );
+
+
+                loadOwnerReceipts();
+                loadUserCollections();
+
+
+
+                if (
+                    typeof loadOwnerDashboard ===
+                    "function"
+                ) {
+
+                    loadOwnerDashboard();
+
+                }
+
+            };
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "EDIT RECEIPT ERROR:",
+            error
+        );
+
+        alert(
+            "Could not open the edit receipt."
+        );
+
+    }
+
+}
+// ======================================================
+// OWNER - TOTAL COLLECTED BY USER
+// ======================================================
+
+async function loadUserCollections() {
+
+    try {
+
+        // Get users
+        const usersResponse =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/users" +
+                "?select=user_id,full_name,username",
+                {
+                    method: "GET",
+                    headers: getSupabaseHeaders()
+                }
+            );
+
+
+        if (!usersResponse.ok) {
+
+            throw new Error(
+                await usersResponse.text()
+            );
+
+        }
+
+
+        const users =
+            await usersResponse.json();
+
+
+        // Get receipts
+        const receiptsResponse =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/payment_receipts" +
+                "?select=receipt_id,amount,created_by",
+                {
+                    method: "GET",
+                    headers: getSupabaseHeaders()
+                }
+            );
+
+
+        if (!receiptsResponse.ok) {
+
+            throw new Error(
+                await receiptsResponse.text()
+            );
+
+        }
+
+
+        const receipts =
+            await receiptsResponse.json();
+
+
+        // ==================================================
+        // CALCULATE TOTALS
+        // ==================================================
+
+        const totals = {};
+
+
+        users.forEach(function (user) {
+
+            totals[user.user_id] = 0;
+
+        });
+
+
+        receipts.forEach(function (receipt) {
+
+            const userId =
+                receipt.created_by;
+
+            const amount =
+                Number(receipt.amount) || 0;
+
+
+            if (
+                totals[userId] !== undefined
+            ) {
+
+                totals[userId] += amount;
+
+            }
+
+        });
+
+
+        // ==================================================
+        // DISPLAY
+        // ==================================================
+
+        const tbody =
+            document.getElementById(
+                "userCollectionsTableBody"
+            );
+
+
+        if (!tbody) {
+            return;
+        }
+
+
+        tbody.innerHTML = "";
+
+
+        let grandTotal = 0;
+
+
+        users.forEach(function (user) {
+
+            const total =
+                totals[user.user_id] || 0;
+
+
+            grandTotal += total;
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${user.user_id}
+                </td>
+
+                <td>
+                    ${escapeHTML(
+                        user.full_name ||
+                        user.username ||
+                        "Unknown"
+                    )}
+                </td>
+
+                <td>
+                    $${total.toLocaleString(
+                        "en-US",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
+                </td>
+
+            `;
+
+
+            tbody.appendChild(row);
+
+        });
+
+
+        // ==================================================
+        // GRAND TOTAL
+        // ==================================================
+
+        const grandTotalElement =
+            document.getElementById(
+                "usersGrandTotal"
+            );
+
+
+        if (grandTotalElement) {
+
+            grandTotalElement.textContent =
+                "$" +
+                grandTotal.toLocaleString(
+                    "en-US",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "USER COLLECTIONS ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// OWNER - OPEN USER COLLECTIONS PAGE
+// ======================================================
+
+function openUserCollections() {
+
+    window.location.href =
+        "user-collections.html";
+
+}
+// ======================================================
+// USER COLLECTIONS - BACK TO OWNER
+// ======================================================
+
+function goBackToOwner() {
+
+    window.location.href =
+        "owner-home.html";
+
+}
+// ======================================================
+// USER COLLECTIONS PAGE
+// ======================================================
+
+if (
+    window.location.pathname
+        .toLowerCase()
+        .includes("user-collections.html")
+) {
+
+    loadUserCollections();
+
+}
+
+
+// ======================================================
+// BACK TO OWNER HOME
+// ======================================================
+
+function goBackToOwner() {
+
+    window.location.href =
+        "owner-home.html";
 
 }

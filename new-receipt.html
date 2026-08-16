@@ -27,13 +27,20 @@
 
 
     <!-- Main Content -->
+     <div class="greenlab-header">
+    <img
+        src="greenlab-logo.png"
+        alt="GreenLab Logo"
+        class="greenlab-logo"
+    >
+</div>
+
     <main class="receipt-container">
 
         <div class="page-header">
             <h1>New Payment Receipt</h1>
             <p>Enter the payment information below.</p>
         </div>
-
 
         <!-- Receipt Form -->
         <form id="receiptForm" class="receipt-form">
@@ -109,6 +116,75 @@
                 >
 
             </div>
+            <div class="form-group">
+
+    <label for="receiptType">
+        Receipt Type
+    </label>
+
+    <div class="receipt-type-options">
+
+        <label class="receipt-type-option">
+
+            <input
+                type="radio"
+                name="receiptType"
+                value="actual"
+                checked
+            >
+
+            <span>
+                Actual Receipt
+            </span>
+
+        </label>
+
+
+        <label class="receipt-type-option">
+
+            <input
+                type="radio"
+                name="receiptType"
+                value="official"
+            >
+
+            <span>
+                Official Receipt
+            </span>
+
+        </label>
+
+    </div>
+    <div class="form-group">
+
+    <label>Receipt Company</label>
+
+    <div class="receipt-company-options">
+
+        <label>
+            <input
+                type="radio"
+                name="company"
+                value="GreenLab"
+                checked
+            >
+            GreenLab
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="company"
+                value="Biocare"
+            >
+            Biocare
+        </label>
+
+    </div>
+
+</div>
+
+</div>
 
 
             <!-- Buttons -->
@@ -120,13 +196,12 @@
                     Save Receipt
                 </button>
 
-                <button
-                    type="button"
-                    class="cancel-btn"
-                    onclick="goBack()">
-                    Cancel
-                </button>
-
+               <button
+    type="button"
+    class="cancel-btn"
+    onclick="goToCorrectHome()">
+    Cancel
+</button>
             </div>
 
 

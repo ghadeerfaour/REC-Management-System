@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Owner Dashboard - REC Management System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+
+<body>
+
+    <!-- ==================================================
+         HEADER
+         ================================================== -->
+
+    <header class="top-bar">
+
+        <div class="logo">
+            REC Management System
+        </div>
+
+        <div class="owner-title">
+            Owner Dashboard
+        </div>
+
+        <button
+            class="logout-btn"
+            onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </header>
+
+
+    <!-- ==================================================
+         MAIN
+         ================================================== -->
+
+    <main class="owner-container">
+
+
+        <!-- Welcome -->
+
+        <div class="page-header">
+
+            <h1>
+                Welcome, <span id="ownerName">
+                    Owner
+                </span>
+            </h1>
+
+            <p>
+                Manage and monitor all payment receipts.
+            </p>
+
+        </div>
+
+
+        <!-- ==================================================
+     STATISTICS
+     ================================================== -->
+
+<div class="owner-stats">
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Total Receipts
+        </div>
+
+        <div
+            class="stat-value"
+            id="totalReceipts">
+
+            0
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Total Amount
+        </div>
+
+        <div
+            class="stat-value"
+            id="totalAmount">
+
+            $0.00
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            GreenLab Receipts
+        </div>
+
+        <div
+            class="stat-value"
+            id="greenlabTotal">
+
+            0
+
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Bioclare Receipts
+        </div>
+
+        <div
+            class="stat-value"
+            id="biocareTotal">
+
+            0
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+    <!-- ==================================================
+     COLLECTIONS BY USER
+     ================================================== -->
+
+<div class="owner-collections-toggle">
+
+    <button
+    type="button"
+    class="owner-action-btn"
+    onclick="openUserCollections()">
+
+    Total Collected by User
+
+</button>
+</div>
+
+
+<section
+    class="owner-user-collections"
+    id="userCollectionsSection"
+    style="display: none;">
+
+    <div class="owner-user-collections-header">
+
+        <h2>
+            Total Collected by User
+        </h2>
+
+        <p>
+            View the total amount collected by each user.
+        </p>
+
+    </div>
+
+
+    <div class="owner-user-collections-table">
+
+        <table id="userCollectionsTable">
+
+            <thead>
+
+                <tr>
+
+                    <th>User ID</th>
+
+                    <th>User</th>
+
+                    <th>Total Collected</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="userCollectionsTableBody">
+
+            </tbody>
+
+
+            <tfoot>
+
+                <tr>
+
+                    <th colspan="2">
+                        Total
+                    </th>
+
+                    <th id="usersGrandTotal">
+                        $0.00
+                    </th>
+
+                </tr>
+
+            </tfoot>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     RECEIPT MANAGEMENT
+     ================================================== -->
+
+<div class="owner-actions">
+
+    <button
+        class="owner-action-btn"
+        onclick="openOwnerGreenlabReceipts()">
+
+        GreenLab Receipts
+
+    </button>
+
+
+    <button
+        class="owner-action-btn"
+        onclick="openOwnerBiocareReceipts()">
+
+        Bioclare Receipts
+
+    </button>
+
+</div>
+
+        <!-- ==================================================
+             ALL RECEIPTS
+             ================================================== -->
+
+        <section class="owner-receipts-section">
+
+
+            <div class="page-header">
+
+                <h2>
+                    All Receipts
+                </h2>
+
+                <p>
+                    Search and edit saved receipts.
+                </p>
+
+            </div>
+<button
+    type="button"
+    class="owner-action-btn"
+    onclick="openNewReceipt()">
+
+    <span>＋</span>
+    New Receipt
+
+</button>
+            <!-- Search -->
+
+            <div class="receipt-search">
+
+                <input
+                    type="text"
+                    id="ownerReceiptSearch"
+                    placeholder="Search by customer name...">
+
+            </div>
+
+
+            <!-- Table -->
+
+            <div class="table-container">
+
+                <table id="ownerReceiptsTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Receipt #
+                            </th>
+
+                            <th>
+                                Company
+                            </th>
+
+                            <th>
+                                Customer
+                            </th>
+
+                            <th>
+                                Payment
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Receipt Type
+                            </th>
+
+                            <th>
+                                Created By
+                            </th>
+
+                            <th>
+                                Edit
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="ownerReceiptsTableBody">
+
+                        <!-- Receipts loaded by JavaScript -->
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </section>
+      
+
+
+    </main>
+
+
+    <script
+        src="script.js">
+    </script>
+
+</body>
+
+</html>
