@@ -416,7 +416,209 @@ function openOwnerBiocareReceipts() {
         "bioclare-receipts.html";
 
 }
+// ======================================================
+// CONVERT AMOUNT TO WORDS
+// ======================================================
 
+function numberToWords(number) {
+
+    number = Number(number);
+
+    if (!Number.isFinite(number)) {
+        return "";
+    }
+
+    number = Math.round(number * 100) / 100;
+
+    const ones = [
+        "",
+        "One",
+        "Two",
+        "Three",
+        "Four",
+        "Five",
+        "Six",
+        "Seven",
+        "Eight",
+        "Nine",
+        "Ten",
+        "Eleven",
+        "Twelve",
+        "Thirteen",
+        "Fourteen",
+        "Fifteen",
+        "Sixteen",
+        "Seventeen",
+        "Eighteen",
+        "Nineteen"
+    ];
+
+    const tens = [
+        "",
+        "",
+        "Twenty",
+        "Thirty",
+        "Forty",
+        "Fifty",
+        "Sixty",
+        "Seventy",
+        "Eighty",
+        "Ninety"
+    ];
+
+    function convertLessThanThousand(num) {
+
+        let words = "";
+
+        if (num >= 100) {
+
+            words +=
+                ones[Math.floor(num / 100)] +
+                " Hundred ";
+
+            num %= 100;
+        }
+
+        if (num >= 20) {
+
+            words +=
+                tens[Math.floor(num / 10)];
+
+            if (num % 10 !== 0) {
+
+                words +=
+                    " " +
+                    ones[num % 10];
+            }
+
+        } else if (num > 0) {
+
+            words += ones[num];
+
+        }
+
+        return words.trim();
+    }
+
+
+    if (number === 0) {
+
+        return "Zero Dollars Only";
+
+    }
+
+
+    const dollars =
+        Math.floor(number);
+
+    const cents =
+        Math.round(
+            (number - dollars) * 100
+        );
+
+
+    let result = "";
+
+
+    if (dollars > 0) {
+
+        if (dollars >= 1000000) {
+
+            result +=
+                convertLessThanThousand(
+                    Math.floor(dollars / 1000000)
+                ) +
+                " Million ";
+
+        }
+
+        const thousands =
+            Math.floor(
+                (dollars % 1000000) / 1000
+            );
+
+        if (thousands > 0) {
+
+            result +=
+                convertLessThanThousand(
+                    thousands
+                ) +
+                " Thousand ";
+
+        }
+
+        const remainder =
+            dollars % 1000;
+
+        if (remainder > 0) {
+
+            result +=
+                convertLessThanThousand(
+                    remainder
+                );
+        }
+
+        result +=
+            dollars === 1
+                ? " Dollar"
+                : " Dollars";
+
+    }
+
+
+    if (cents > 0) {
+
+        if (dollars > 0) {
+            result += " and ";
+        }
+
+        result +=
+            convertLessThanThousand(cents) +
+            (cents === 1
+                ? " Cent"
+                : " Cents");
+
+    }
+
+
+    return result.trim() + " Only";
+
+}
+// ======================================================
+// AUTOMATIC SUM OF
+// ======================================================
+
+const amountInput =
+    document.getElementById("amount");
+
+const sumOfInput =
+    document.getElementById("sumOf");
+
+
+if (amountInput && sumOfInput) {
+
+    amountInput.addEventListener(
+        "input",
+        function () {
+
+            const amount =
+                amountInput.value;
+
+            if (amount === "") {
+
+                sumOfInput.value = "";
+
+                return;
+
+            }
+
+            sumOfInput.value =
+                numberToWords(amount);
+
+        }
+    );
+
+}
 
 // ======================================================
 // NEW RECEIPT
@@ -441,6 +643,10 @@ if (receiptForm) {
                 document.getElementById(
                     "customerName"
                 ).value.trim();
+                const customerPhone =
+    document.getElementById(
+        "customerPhone"
+    ).value.trim();
 
 
             const paymentDescription =
@@ -459,6 +665,10 @@ if (receiptForm) {
                 document.getElementById(
                     "paymentDate"
                 ).value;
+                const sumOf =
+    document.getElementById(
+        "sumOf"
+    ).value.trim();
                 const receiptType =
     document.querySelector(
         'input[name="receiptType"]:checked'
@@ -556,6 +766,8 @@ if (receiptForm) {
 
                                     customer_name:
                                         customerName,
+                                         customer_phone:
+            customerPhone,
 
                                     payment_description:
                                         paymentDescription,
@@ -569,6 +781,8 @@ if (receiptForm) {
                                         paymentDate,
                                           receipt_type:
         receiptType,
+        sum_of:
+    sumOf,
 
 company:
     company,
@@ -669,90 +883,105 @@ if (receiptsTableBody) {
 
     async function loadReceipts() {
 
-        try {
+    try {
 
-          const url =
-    SUPABASE_URL +
-    "/rest/v1/payment_receipts" +
-    "?select=receipt_id,greenlab_receipt_id,official_receipt_id,customer_name,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
-    "&company=eq.GreenLab" +
-    "&order=receipt_id.desc";
-
-            console.log(
-                "Loading receipts..."
+        const loggedInUser =
+            JSON.parse(
+                localStorage.getItem("loggedInUser")
             );
 
+        if (!loggedInUser) {
 
-            const response =
-                await fetch(
-                    url,
-                    {
-                        method: "GET",
+            window.location.href = "index.html";
 
-                        headers:
-                            getSupabaseHeaders()
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                const errorText =
-                    await response.text();
-
-                console.error(
-                    "LOAD RECEIPTS ERROR:",
-                    errorText
-                );
-
-                throw new Error(
-                    errorText
-                );
-            }
-
-
-            const receipts =
-                await response.json();
-
-
-            console.log(
-                "Receipts:",
-                receipts
-            );
-
-
-            displayReceipts(
-                receipts
-            );
-
+            return;
         }
 
 
-        catch (error) {
+        const url =
+            SUPABASE_URL +
+            "/rest/v1/payment_receipts" +
+            "?select=receipt_id,greenlab_receipt_id,official_receipt_id,customer_name,customer_phone,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
+            "&created_by=eq." +
+            encodeURIComponent(loggedInUser.user_id) +
+            "&order=receipt_id.desc";
+
+
+        console.log(
+            "Loading employee receipts..."
+        );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers:
+                        getSupabaseHeaders()
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
 
             console.error(
-                "RECEIPTS ERROR:",
-                error
+                "LOAD RECEIPTS ERROR:",
+                errorText
             );
 
-
-            receiptsTableBody.innerHTML = `
-
-                <tr>
-
-                    <td colspan="7">
-
-                        ❌ Could not load receipts.
-
-                    </td>
-
-                </tr>
-
-            `;
-
+            throw new Error(
+                errorText
+            );
         }
 
+
+        const receipts =
+            await response.json();
+
+
+        console.log(
+            "Employee receipts:",
+            receipts
+        );
+
+
+        displayReceipts(
+            receipts
+        );
+
     }
+
+
+    catch (error) {
+
+        console.error(
+            "RECEIPTS ERROR:",
+            error
+        );
+
+
+        receiptsTableBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="10">
+
+                    ❌ Could not load receipts.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
 
 
     // ==================================================
@@ -810,6 +1039,21 @@ if (receiptsTableBody) {
                             receipt.customer_name
                         )}
                     </td>
+                   <td>
+    ${
+        receipt.customer_phone
+            ? `
+                <button
+                    type="button"
+                    class="whatsapp-phone"
+                    onclick='sendPaymentDetailsWhatsApp(${JSON.stringify(receipt)})'
+                >
+                    ${escapeHTML(receipt.customer_phone)}
+                </button>
+              `
+            : ""
+    }
+</td>
 
                     <td>
                         ${escapeHTML(
@@ -869,7 +1113,102 @@ if (receiptsTableBody) {
 
     }
 
+// ======================================================
+// SEND PAYMENT DETAILS VIA WHATSAPP
+// ======================================================
 
+function sendPaymentDetailsWhatsApp(receipt) {
+
+    if (!receipt.customer_phone) {
+
+        alert("This customer does not have a phone number.");
+
+        return;
+    }
+
+
+    // Get the correct receipt number
+
+    let receiptNumber = receipt.receipt_id;
+
+
+    if (
+        receipt.receipt_type === "official"
+    ) {
+
+        receiptNumber =
+            receipt.official_receipt_id ||
+            receipt.receipt_id;
+
+    } else {
+
+        receiptNumber =
+            receipt.greenlab_receipt_id ||
+            receipt.receipt_id;
+
+    }
+
+
+    // Format amount
+
+    const amount =
+        Number(receipt.amount || 0).toLocaleString(
+            "en-US",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+
+
+    // Format phone number
+
+   let phone =
+    receipt.customer_phone.replace(/\D/g, "");
+
+// Automatically add Lebanon country code
+if (phone.startsWith("0")) {
+
+    phone =
+        "961" +
+        phone.substring(1);
+
+}
+else if (!phone.startsWith("961")) {
+
+    phone =
+        "961" +
+        phone;
+
+}
+
+    // WhatsApp message
+
+    const message =
+`Hello ${receipt.customer_name || ""},
+
+We confirm receiving your payment of $${amount} for ${receipt.payment_description || ""} on ${receipt.payment_date || ""}.
+
+Receipt No.: ${receiptNumber}
+
+Thank you for your payment.`;
+
+
+    // Open WhatsApp
+
+    const whatsappURL =
+        "https://wa.me/" +
+        phone +
+        "?text=" +
+        encodeURIComponent(message);
+
+
+    window.open(
+        whatsappURL,
+        "_blank"
+    );
+
+}
     // ==================================================
     // SEARCH RECEIPTS
     // ==================================================
@@ -895,7 +1234,7 @@ if (receiptsTableBody) {
                     let url =
     SUPABASE_URL +
     "/rest/v1/payment_receipts" +
-    "?select=receipt_id,greenlab_receipt_id,official_receipt_id,customer_name,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
+    "?select=receipt_id,greenlab_receipt_id,official_receipt_id,customer_name,customer_phone,payment_description,amount,payment_date,receipt_type,company,created_by,created_at" +
     "&company=eq.GreenLab" +
     "&order=receipt_id.desc";
 
@@ -978,486 +1317,1015 @@ function goBack() {
         "employee-home.html";
 
 }
-function printReceipt(receiptId) {
+// ======================================================
+// PRINT RECEIPT / PDF
+// ======================================================
 
-    const receiptWindow =
-        window.open(
-            "",
-            "_blank",
-            "width=800,height=900"
+async function printReceipt(receiptId) {
+
+    try {
+
+        // ==================================================
+        // GET RECEIPT
+        // ==================================================
+
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/payment_receipts" +
+            "?receipt_id=eq." +
+            encodeURIComponent(receiptId) +
+            "&select=*",
+            {
+                method: "GET",
+                headers: getSupabaseHeaders()
+            }
         );
 
+        if (!response.ok) {
 
-    if (!receiptWindow) {
+            const errorText = await response.text();
 
-        alert(
-            "Please allow pop-ups for this website."
-        );
+            console.error(
+                "PRINT RECEIPT ERROR:",
+                errorText
+            );
 
-        return;
+            throw new Error(errorText);
+        }
+
+        const receipts = await response.json();
+
+        if (!receipts || receipts.length === 0) {
+
+            alert("Receipt not found.");
+
+            return;
+        }
+
+        const receipt = receipts[0];
+
+        console.log("PRINTING RECEIPT:", receipt);
+
+
+        // ==================================================
+        // DETERMINE DISPLAY RECEIPT NUMBER
+        // ==================================================
+
+        let displayReceiptNumber = "";
+
+
+        // GREENLAB
+        if (receipt.company === "GreenLab") {
+
+            if (receipt.receipt_type === "official") {
+
+                // Official GreenLab numbering
+                displayReceiptNumber =
+                    receipt.official_receipt_id;
+
+            } else {
+
+                // Actual GreenLab numbering
+                displayReceiptNumber =
+                    receipt.greenlab_receipt_id;
+            }
+        }
+
+
+        // BIOCARE / BIOCLARE
+        else if (
+            receipt.company === "Biocare" ||
+            receipt.company === "Bioclare"
+        ) {
+
+            if (receipt.receipt_type === "official") {
+
+                displayReceiptNumber =
+                    receipt.biocare_official_receipt_id;
+
+            } else {
+
+                displayReceiptNumber =
+                    receipt.biocare_receipt_id;
+            }
+        }
+
+
+        // ==================================================
+        // FALLBACK
+        // ==================================================
+
+        if (
+            displayReceiptNumber === null ||
+            displayReceiptNumber === undefined ||
+            displayReceiptNumber === ""
+        ) {
+
+            displayReceiptNumber =
+                receipt.receipt_id;
+        }
+
+
+        // ==================================================
+        // RECEIPT TYPE
+        // ==================================================
+
+        const isOfficial =
+            receipt.receipt_type === "official";
+
+
+        // ==================================================
+        // COMPANY
+        // ==================================================
+
+        const isGreenLab =
+            receipt.company === "GreenLab";
+
+
+        // ==================================================
+        // COMPANY INFORMATION
+        // ==================================================
+
+        let englishCompanyInfo = "";
+        let arabicCompanyInfo = "";
+        let companyLogo = "";
+
+
+        if (isGreenLab) {
+
+            companyLogo =
+                "greenlab-logo.png";
+
+
+            englishCompanyInfo = `
+                <strong>Greenlab S.A.R.L</strong><br>
+                +961 7 726629 - +961 81 485 141<br>
+                Beirut Saida Hwy<br>
+                Saida, Lebanon<br>
+                C. R. 5008766
+            `;
+
+
+            arabicCompanyInfo = `
+                <strong>شركة غرين لاب ش.م.م.</strong><br>
+                +961 7 726629 - +961 81 485 141<br>
+                الاوتوتراد الساحلي<br>
+                صيدا، لبنان<br>
+                س.ت. 5008766
+            `;
+        }
+
+
+        // ==================================================
+        // SUM OF
+        // ==================================================
+
+        const sumOf =
+            receipt.sum_of ||
+            numberToWords(receipt.amount);
+
+
+        // ==================================================
+        // OPEN PRINT WINDOW
+        // ==================================================
+
+        const receiptWindow =
+            window.open(
+                "",
+                "_blank",
+                "width=900,height=1000"
+            );
+
+
+        if (!receiptWindow) {
+
+            alert(
+                "Please allow pop-ups for this website."
+            );
+
+            return;
+        }
+
+
+        // ==================================================
+        // RECEIPT HTML
+        // ==================================================
+
+        receiptWindow.document.write(`
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    Payment Receipt #${displayReceiptNumber}
+</title>
+
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+
+    padding: 30px;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: white;
+
+    color: #26364a;
+}
+
+
+.receipt {
+
+    width: 100%;
+
+    max-width: 800px;
+
+    margin: auto;
+
+    padding: 40px;
+
+    border: 1px solid #d9d9d9;
+
+    background: white;
+}
+
+
+/* ======================================================
+   HEADER
+   ====================================================== */
+
+.receipt-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 30px;
+
+    padding-bottom: 20px;
+
+    border-bottom: 2px solid #26364a;
+}
+
+
+.logo-area {
+
+    flex: 1;
+}
+
+
+.company-logo {
+
+    max-width: 190px;
+
+    max-height: 90px;
+
+    object-fit: contain;
+}
+
+
+.receipt-title {
+
+    text-align: right;
+}
+
+
+.receipt-title h1 {
+
+    margin: 0;
+
+    font-size: 27px;
+
+    letter-spacing: 1px;
+}
+
+
+.receipt-title p {
+
+    margin: 7px 0 0;
+
+    color: #687580;
+
+    font-size: 14px;
+}
+
+
+.receipt-number {
+
+    margin-top: 10px;
+
+    font-size: 14px;
+
+    color: #687580;
+}
+
+
+.receipt-number strong {
+
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 23px;
+
+    color: #2b60a0;
+}
+
+
+/* ======================================================
+   OFFICIAL COMPANY INFORMATION
+   ====================================================== */
+
+.company-information {
+
+    display: flex;
+
+    flex-direction: row;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 30px;
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 15px 0;
+}
+
+
+.company-info {
+
+    width: 50%;
+
+    line-height: 1.7;
+
+    font-size: 12px;
+}
+
+
+.company-info.english {
+
+    text-align: left;
+
+    direction: ltr;
+}
+
+
+.company-info.arabic {
+
+    text-align: right;
+
+    direction: rtl;
+}
+
+
+.company-info strong {
+
+    font-size: 14px;
+}
+
+
+/* ======================================================
+   SECTIONS
+   ====================================================== */
+
+.section {
+
+    margin-top: 30px;
+}
+
+
+.section-title {
+
+    margin-bottom: 12px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    color: #26364a;
+}
+
+
+.info-box {
+
+    padding: 18px;
+
+    background: #f5f7f9;
+
+    border-radius: 8px;
+}
+
+
+.row {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 20px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #e5e8eb;
+}
+
+
+.row:last-child {
+
+    border-bottom: none;
+}
+
+
+.label {
+
+    color: #687580;
+}
+
+
+.value {
+
+    font-weight: bold;
+
+    text-align: right;
+}
+
+
+/* ======================================================
+   SUM OF
+   ====================================================== */
+
+.sum-of-box {
+
+    margin-top: 20px;
+
+    padding: 18px;
+
+    border: 1px solid #d9dfe5;
+
+    border-radius: 8px;
+
+    background: white;
+}
+
+
+.sum-of-label {
+
+    font-size: 13px;
+
+    color: #687580;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+}
+
+
+.sum-of-value {
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    color: #26364a;
+
+    line-height: 1.6;
+
+    min-height: 25px;
+}
+
+
+/* ======================================================
+   AMOUNT
+   ====================================================== */
+
+.amount {
+
+    margin-top: 25px;
+
+    padding: 22px;
+
+    background: #f5f7f9;
+
+    text-align: center;
+
+    border-radius: 8px;
+}
+
+
+.amount-label {
+
+    color: #687580;
+
+    font-size: 14px;
+}
+
+
+.amount-value {
+
+    margin-top: 8px;
+
+    font-size: 31px;
+
+    font-weight: bold;
+
+    color: #2b60a0;
+}
+
+
+/* ======================================================
+   FOOTER
+   ====================================================== */
+
+.receipt-footer {
+
+    margin-top: 45px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #ddd;
+
+    text-align: center;
+}
+
+
+.footer-success {
+
+    color: #2c825d;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+
+.footer-logos {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 25px;
+
+    margin-top: 20px;
+
+    flex-wrap: wrap;
+}
+
+
+.footer-logos img {
+
+    max-width: 75px;
+
+    max-height: 45px;
+
+    object-fit: contain;
+}
+
+
+.footer-note {
+
+    margin-top: 15px;
+
+    color: #687580;
+
+    font-size: 11px;
+}
+
+
+/* ======================================================
+   PRINT
+   ====================================================== */
+
+@media print {
+
+    body {
+
+        padding: 0;
     }
 
+    .receipt {
 
-    receiptWindow.document.write(`
+        border: none;
 
-        <!DOCTYPE html>
+        max-width: none;
 
-        <html>
+        padding: 20px;
+    }
+}
 
-        <head>
 
-            <title>Payment Receipt #${receiptId}</title>
+/* ======================================================
+   MOBILE
+   ====================================================== */
 
-            <style>
+@media (max-width: 600px) {
 
-                * {
-                    box-sizing: border-box;
+    body {
+
+        padding: 10px;
+    }
+
+    .receipt {
+
+        padding: 20px;
+    }
+
+    .receipt-header {
+
+        flex-direction: column;
+    }
+
+    .receipt-title {
+
+        text-align: left;
+    }
+
+    .company-information {
+
+        flex-direction: row;
+    }
+
+    .company-info {
+
+        width: 50%;
+
+        font-size: 9px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="receipt">
+
+
+    <!-- HEADER -->
+
+    <div class="receipt-header">
+
+        <div class="logo-area">
+
+            ${
+                companyLogo
+                ? `
+                    <img
+                        src="${companyLogo}"
+                        class="company-logo"
+                        alt="Company Logo"
+                    >
+                `
+                : ""
+            }
+
+        </div>
+
+
+        <div class="receipt-title">
+
+            <h1>
+
+                ${
+                    isOfficial
+                    ? "OFFICIAL PAYMENT RECEIPT"
+                    : "PAYMENT RECEIPT"
                 }
 
-                body {
-                    margin: 0;
-                    padding: 40px;
+            </h1>
 
-                    font-family:
-                        Arial,
-                        Helvetica,
-                        sans-serif;
 
-                    color: #26364a;
+            <p>
+                Payment Receipt Management System
+            </p>
 
-                    background: white;
-                }
 
-                .receipt {
-                    max-width: 750px;
-                    margin: auto;
-                    padding: 40px;
+            <div class="receipt-number">
 
-                    border: 1px solid #ddd;
-                }
+                Receipt No.
 
-                .header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
+                <strong>
+                    ${escapeHTML(displayReceiptNumber)}
+                </strong>
 
-                    padding-bottom: 20px;
+            </div>
 
-                    border-bottom:
-                        2px solid #26364a;
-                }
+        </div>
 
-                h1 {
-                    margin: 0;
+    </div>
 
-                    font-size: 28px;
-                }
 
-                .subtitle {
-                    margin-top: 8px;
+    <!-- OFFICIAL COMPANY INFORMATION -->
 
-                    color: #687580;
-                }
+    ${
+        isOfficial && isGreenLab
+        ? `
 
-                .receipt-number {
-                    text-align: right;
-                }
+        <div class="company-information">
 
-                .receipt-number strong {
-                    display: block;
+            <div class="company-info english">
 
-                    margin-top: 5px;
-
-                    font-size: 22px;
-
-                    color: #2b60a0;
-                }
-
-                .section {
-                    margin-top: 30px;
-                }
-
-                .section-title {
-                    margin-bottom: 12px;
-
-                    font-size: 15px;
-
-                    font-weight: bold;
-
-                    color: #26364a;
-                }
-
-                .info-box {
-                    padding: 18px;
-
-                    background: #f5f7f9;
-
-                    border-radius: 8px;
-                }
-
-                .row {
-                    display: flex;
-
-                    justify-content:
-                        space-between;
-
-                    gap: 20px;
-
-                    padding: 15px 0;
-
-                    border-bottom:
-                        1px solid #e5e8eb;
-                }
-
-                .row:last-child {
-                    border-bottom: none;
-                }
-
-                .label {
-                    color: #687580;
-                }
-
-                .value {
-                    font-weight: bold;
-
-                    text-align: right;
-                }
-
-                .amount {
-                    margin-top: 25px;
-
-                    padding: 20px;
-
-                    background: #f5f7f9;
-
-                    text-align: center;
-
-                    border-radius: 8px;
-                }
-
-                .amount-label {
-                    color: #687580;
-
-                    font-size: 14px;
-                }
-
-                .amount-value {
-                    margin-top: 8px;
-
-                    font-size: 30px;
-
-                    font-weight: bold;
-
-                    color: #2b60a0;
-                }
-
-                .footer {
-                    margin-top: 40px;
-
-                    padding-top: 20px;
-
-                    border-top:
-                        1px solid #ddd;
-
-                    text-align: center;
-
-                    color: #687580;
-                }
-
-                .success {
-                    color: #2c825d;
-
-                    font-weight: bold;
-                }
-
-                @media print {
-
-                    body {
-                        padding: 0;
-                    }
-
-                    .receipt {
-                        border: none;
-                        padding: 20px;
-                    }
-
-                }
-
-            </style>
-
-        </head>
-
-
-        <body>
-
-            <div class="receipt">
-
-                <div class="header">
-
-                    <div>
-
-                        <h1>
-                            PAYMENT RECEIPT
-                        </h1>
-
-                        <div class="subtitle">
-                            Payment Receipt Management System
-                        </div>
-
-                    </div>
-
-
-                    <div class="receipt-number">
-
-                        Receipt No.
-
-                        <strong>
-                            ${receiptId}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <div class="section">
-
-                    <div class="section-title">
-                        Customer Information
-                    </div>
-
-                    <div class="info-box">
-
-                        <div class="row">
-
-                            <span class="label">
-                                Customer Name
-                            </span>
-
-                            <span
-                                class="value"
-                                id="printCustomer">
-                                Loading...
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="section">
-
-                    <div class="section-title">
-                        Payment Information
-                    </div>
-
-                    <div class="info-box">
-
-                        <div class="row">
-
-                            <span class="label">
-                                Description
-                            </span>
-
-                            <span
-                                class="value"
-                                id="printDescription">
-                                Loading...
-                            </span>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <span class="label">
-                                Payment Date
-                            </span>
-
-                            <span
-                                class="value"
-                                id="printDate">
-                                Loading...
-                            </span>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <span class="label">
-                                Created By
-                            </span>
-
-                            <span
-                                class="value"
-                                id="printEmployee">
-                                Loading...
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="amount">
-
-                    <div class="amount-label">
-                        AMOUNT PAID
-                    </div>
-
-                    <div
-                        class="amount-value"
-                        id="printAmount">
-
-                        Loading...
-
-                    </div>
-
-                </div>
-
-
-                <div class="footer">
-
-                    <div class="success">
-                        ✓ Payment received successfully
-                    </div>
-
-                    <p>
-                        Thank you for your payment.
-                    </p>
-
-                    <small>
-                        This receipt was generated electronically.
-                    </small>
-
-                </div>
+                ${englishCompanyInfo}
 
             </div>
 
 
-            <script>
+            <div class="company-info arabic">
 
-                const SUPABASE_URL =
-                    "${SUPABASE_URL}";
+                ${arabicCompanyInfo}
 
-                const SUPABASE_KEY =
-                    "${SUPABASE_KEY}";
+            </div>
 
+        </div>
 
-                fetch(
-                    SUPABASE_URL +
-                    "/rest/v1/payment_receipts" +
-                    "?receipt_id=eq.${receiptId}" +
-                    "&select=*",
-                    {
-                        headers: {
-                            "apikey":
-                                SUPABASE_KEY
-                        }
-                    }
-                )
-
-                .then(
-                    response =>
-                        response.json()
-                )
-
-                .then(
-                    data => {
-
-                        if (
-                            !data ||
-                            data.length === 0
-                        ) {
-
-                            document.body.innerHTML =
-                                "<h2>Receipt not found.</h2>";
-
-                            return;
-                        }
+        `
+        : ""
+    }
 
 
-                        const receipt =
-                            data[0];
+    <!-- CUSTOMER -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Customer Information
+        </div>
 
 
-                        document.getElementById(
-                            "printCustomer"
-                        ).textContent =
-                            receipt.customer_name || "";
+        <div class="info-box">
+
+            <div class="row">
+
+                <span class="label">
+                    Customer Name
+                </span>
 
 
-                        document.getElementById(
-                            "printDescription"
-                        ).textContent =
-                            receipt.payment_description || "";
+                <span class="value">
+
+                    ${escapeHTML(
+                        receipt.customer_name || ""
+                    )}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
-                        document.getElementById(
-                            "printDate"
-                        ).textContent =
-                            receipt.payment_date || "";
+    <!-- PAYMENT -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Payment Information
+        </div>
 
 
-                        document.getElementById(
-                            "printEmployee"
-                        ).textContent =
-                            receipt.created_by || "";
+        <div class="info-box">
+
+            <div class="row">
+
+                <span class="label">
+                    Description
+                </span>
 
 
-                        document.getElementById(
-                            "printAmount"
-                        ).textContent =
-                            "$" +
-                            Number(
-                                receipt.amount || 0
-                            ).toFixed(2);
+                <span class="value">
+
+                    ${escapeHTML(
+                        receipt.payment_description || ""
+                    )}
+
+                </span>
+
+            </div>
 
 
-                        setTimeout(
-                            function() {
+            <div class="row">
 
-                                window.print();
-
-                            },
-                            500
-                        );
-
-                    }
-                )
-
-                .catch(
-                    error => {
-
-                        console.error(
-                            error
-                        );
-
-                        document.body.innerHTML =
-                            "<h2>Could not load receipt.</h2>";
-
-                    }
-                );
-
-            <\/script>
-
-        </body>
-
-        </html>
-
-    `);
+                <span class="label">
+                    Payment Date
+                </span>
 
 
-    receiptWindow.document.close();
+                <span class="value">
+
+                    ${escapeHTML(
+                        receipt.payment_date || ""
+                    )}
+
+                </span>
+
+            </div>
+
+
+            <div class="row">
+
+                <span class="label">
+                    Created By
+                </span>
+
+
+                <span class="value">
+
+                    ${escapeHTML(
+                        receipt.created_by ?? ""
+                    )}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- THE SUM OF -->
+
+    <div class="sum-of-box">
+
+        <div class="sum-of-label">
+            The Sum Of
+        </div>
+
+
+        <div class="sum-of-value">
+
+            ${escapeHTML(sumOf)}
+
+        </div>
+
+    </div>
+
+
+    <!-- AMOUNT -->
+
+    <div class="amount">
+
+        <div class="amount-label">
+            AMOUNT PAID
+        </div>
+
+
+        <div class="amount-value">
+
+            $
+
+            ${Number(
+                receipt.amount || 0
+            ).toLocaleString(
+                "en-US",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            )}
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="receipt-footer">
+
+        <div class="footer-success">
+            ✓ Payment received successfully
+        </div>
+
+
+        <p>
+            Thank you for your payment.
+        </p>
+
+
+        ${
+            isOfficial && isGreenLab
+            ? `
+
+            <div class="footer-logos">
+
+                <img
+                    src="iso-logo.png"
+                    alt="ISO Certification"
+                >
+
+                <img
+                    src="npma-logo.png"
+                    alt="NPMA"
+                >
+
+                <img
+                    src="cieh-logo.png"
+                    alt="Chartered Institute of Environmental Health"
+                >
+
+                <img
+                    src="bpca-logo.png"
+                    alt="BPCA"
+                >
+
+            </div>
+
+            `
+            : ""
+        }
+
+
+        <div class="footer-note">
+
+            This receipt was generated electronically.
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
+
+        `);
+
+
+        receiptWindow.document.close();
+
+
+        // ==================================================
+        // WAIT THEN PRINT
+        // ==================================================
+
+        setTimeout(
+            function () {
+
+                receiptWindow.focus();
+
+                receiptWindow.print();
+
+            },
+            1000
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "PRINT RECEIPT ERROR:",
+            error
+        );
+
+        alert(
+            "Could not generate the receipt."
+        );
+
+    }
 
 }
-
-
 // ======================================================
 // LOGOUT
 // ======================================================
